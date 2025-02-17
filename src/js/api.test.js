@@ -1,22 +1,69 @@
-const { fetchCats } = require('./api');
+import { fetchCats } from './api';
 
-describe('Cat API', () => {
-    test('fetchCats returns array of cat objects', async () => {
-        const cats = await fetchCats(2);
-        expect(Array.isArray(cats)).toBe(true);
-        expect(cats.length).toBe(2);
-        expect(cats[0]).toHaveProperty('url');
-        expect(cats[0]).toHaveProperty('id');
+// Mock fetch globally
+global.fetch = jest.fn();
+global.console.error = jest.fn();
+
+describe('fetchCats', () => {
+    beforeEach(() => {
+        fetch.mockClear();
+        console.error.mockClear();
     });
 
-    test('fetchCats handles errors gracefully', async () => {
-        // Mock fetch to simulate error
-        global.fetch = jest.fn(() => 
-            Promise.reject(new Error('API Error'))
-        );
+    it('fetches cats with default limit of 6', async () => {
+        const mockData = [{ id: 1, url: 'cat1.jpg' }, { id: 2, url: 'cat2.jpg' }];
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockData
+        });
 
-        const cats = await fetchCats();
-        expect(Array.isArray(cats)).toBe(true);
-        expect(cats.length).toBe(0);
+        const result = await fetchCats();
+        
+        expect(fetch).toHaveBeenCalledWith(
+            'https://api.thecatapi.com/v1/images/search?limit=6',
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    'x-api-key': expect.any(String)
+                })
+            })
+        );
+        expect(result).toEqual(mockData);
+    });
+
+    it('fetches cats with custom limit', async () => {
+        const mockData = [{ id: 1, url: 'cat1.jpg' }];
+        fetch.mockResolvedValueOnce({
+            ok: true,
+            json: async () => mockData
+        });
+
+        const result = await fetchCats(1);
+        
+        expect(fetch).toHaveBeenCalledWith(
+            'https://api.thecatapi.com/v1/images/search?limit=1',
+            expect.any(Object)
+        );
+        expect(result).toEqual(mockData);
+    });
+
+    it('handles HTTP errors', async () => {
+        fetch.mockResolvedValueOnce({
+            ok: false,
+            status: 404
+        });
+
+        const result = await fetchCats();
+        
+        expect(result).toEqual([]);
+        expect(console.error).toHaveBeenCalled();
+    });
+
+    it('handles network errors', async () => {
+        fetch.mockRejectedValueOnce(new Error('Network error'));
+
+        const result = await fetchCats();
+        
+        expect(result).toEqual([]);
+        expect(console.error).toHaveBeenCalled();
     });
 });

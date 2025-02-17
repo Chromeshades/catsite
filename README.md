@@ -1,15 +1,18 @@
 # Cat Web App
 
-This project is a web application that dynamically displays cats using the Cat API and the cats-js library.
+This project is a web application that dynamically displays cat images using the Cat API and React.
 
 ## Project Structure
 
-- `src/index.html`: The main HTML document for the website.
-- `src/css/styles.css`: Contains the styles for the website.
-- `src/js/app.js`: The main JavaScript file that initializes the application.
-- `src/js/api.js`: Contains functions to interact with the Cat API.
-- `.env`: Contains environment variables, including the `CAT_API_KEY`.
-- `package.json`: Configuration file for npm, listing dependencies and scripts.
+- src/index.html: Main HTML file that loads the React app.
+- src/css/styles.css: Styles for the application.
+- src/js/api.js: Contains functions to interact with the Cat API.
+- src/js/api.test.js: Tests for the Cat API functionality.
+- src/js/components/App.jsx: Main React component for the application.
+- src/js/main.jsx: React entry point.
+- vite.config.js: Configuration file for Vite.
+- .env: Contains environment variables (use VITE_CAT_API_KEY).
+- package.json: Project dependencies and scripts.
 
 ## Setup Instructions
 
@@ -20,21 +23,43 @@ This project is a web application that dynamically displays cats using the Cat A
 
 2. Navigate to the project directory:
    ```
-   cd cat-web-app
+   cd catsite
    ```
 
-3. Install the dependencies:
+3. Install dependencies:
    ```
    npm install
    ```
 
-4. Create a `.env` file in the root directory and add your Cat API key:
+4. Create a .env file in the root directory and add your Cat API key with the VITE_ prefix:
    ```
-   CAT_API_KEY=your_api_key_here
+   VITE_CAT_API_KEY=your_api_key_here
    ```
 
-5. Open `src/index.html` in your browser to view the application.
+5. Start the development server:
+   ```
+   npm run start
+   ```
+   The app will be available at [http://localhost:3000](http://localhost:3000).
 
-## Usage
+6. Build the project for production:
+   ```
+   npm run build
+   ```
 
-Once the application is running, it will fetch and display cat images dynamically from the Cat API. Enjoy the cuteness!
+7. Preview the production build:
+   ```
+   npm run preview
+   ```
+
+## Testing
+
+Run the tests with:
+
+```
+npm run test
+```
+
+## Notes
+
+This project uses Vite as the build tool and React for the user interface.
