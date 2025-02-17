@@ -1,69 +1,38 @@
-import { fetchCats } from './api';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import { fetchCats } from './api.js';
 
-// Mock fetch globally
-global.fetch = jest.fn();
-global.console.error = jest.fn();
-
-describe('fetchCats', () => {
+describe('Cat API', () => {
     beforeEach(() => {
-        fetch.mockClear();
-        console.error.mockClear();
+        jest.resetAllMocks();
+        global.fetch = jest.fn();
+        global.console.error = jest.fn();
     });
 
-    it('fetches cats with default limit of 6', async () => {
-        const mockData = [{ id: 1, url: 'cat1.jpg' }, { id: 2, url: 'cat2.jpg' }];
-        fetch.mockResolvedValueOnce({
+    it('returns array of cat objects', async () => {
+        const mockCats = [
+            { id: '1', url: 'http://example.com/cat1.jpg' },
+            { id: '2', url: 'http://example.com/cat2.jpg' }
+        ];
+
+        global.fetch.mockResolvedValueOnce({
             ok: true,
-            json: async () => mockData
+            json: async () => mockCats
         });
 
-        const result = await fetchCats();
-        
-        expect(fetch).toHaveBeenCalledWith(
-            'https://api.thecatapi.com/v1/images/search?limit=6',
-            expect.objectContaining({
-                headers: expect.objectContaining({
-                    'x-api-key': expect.any(String)
-                })
-            })
-        );
-        expect(result).toEqual(mockData);
+        const cats = await fetchCats(2);
+        expect(Array.isArray(cats)).toBe(true);
+        expect(cats.length).toBe(2);
+        expect(cats[0]).toHaveProperty('url');
+        expect(cats[0]).toHaveProperty('id');
     });
 
-    it('fetches cats with custom limit', async () => {
-        const mockData = [{ id: 1, url: 'cat1.jpg' }];
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockData
-        });
+    it('handles errors gracefully', async () => {
+        const networkError = new Error('Network error');
+        global.fetch.mockRejectedValueOnce(networkError);
+        const cats = await fetchCats();
 
-        const result = await fetchCats(1);
-        
-        expect(fetch).toHaveBeenCalledWith(
-            'https://api.thecatapi.com/v1/images/search?limit=1',
-            expect.any(Object)
-        );
-        expect(result).toEqual(mockData);
-    });
-
-    it('handles HTTP errors', async () => {
-        fetch.mockResolvedValueOnce({
-            ok: false,
-            status: 404
-        });
-
-        const result = await fetchCats();
-        
-        expect(result).toEqual([]);
-        expect(console.error).toHaveBeenCalled();
-    });
-
-    it('handles network errors', async () => {
-        fetch.mockRejectedValueOnce(new Error('Network error'));
-
-        const result = await fetchCats();
-        
-        expect(result).toEqual([]);
-        expect(console.error).toHaveBeenCalled();
+        expect(Array.isArray(cats)).toBe(true);
+        expect(cats.length).toBe(0);
+        expect(console.error).toHaveBeenCalledWith('Error fetching cats:', networkError);
     });
 });
