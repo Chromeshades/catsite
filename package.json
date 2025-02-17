@@ -4,7 +4,7 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
@@ -20,17 +20,19 @@
   "jest": {
     "transform": {
       "^.+\\.[tj]sx?$": ["babel-jest", {
-        "targets": { "node": "current" },
-        "configFile": "./babel.config.cjs"
+        "targets": { "node": "current" }
       }]
     },
     "testEnvironment": "jsdom",
     "setupFiles": [
-      "<rootDir>/jest.setup.js"
+      "<rootDir>/jest.setup.cjs"
     ],
     "testEnvironmentOptions": {
       "url": "http://localhost"
-    }
+    },
+    "testMatch": [
+      "**/*.test.cjs"
+    ]
   },
   "dependencies": {
     "@types/node": "^22.13.4",

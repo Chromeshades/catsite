@@ -11,8 +11,3 @@ global.console.error = jest.fn();
 
 // Mock process.env if not defined
 process.env.VITE_CAT_API_KEY = process.env.VITE_CAT_API_KEY || 'test-api-key';
-
-// Add global test hooks to global scope
-global.beforeEach = () => {
-    jest.resetAllMocks();
-};
